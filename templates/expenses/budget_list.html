@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Budgets | Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0">Budgets</h4>
+  <a href="{% url 'expenses:budget-add' %}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i> Set Budget
+  </a>
+</div>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Category</th><th>Month</th><th>Limit</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for b in budgets %}
+        <tr>
+          <td>{{ b.category }}</td>
+          <td>{{ b.month|date:"M Y" }}</td>
+          <td>Rs.{{ b.limit|floatformat:2 }}</td>
+          <td class="text-end">
+            <a href="{% url 'expenses:budget-delete' b.pk %}" class="btn btn-sm btn-outline-danger">
+              <i class="bi bi-trash"></i>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-center text-muted py-4">No budgets set.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+

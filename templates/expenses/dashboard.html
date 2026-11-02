@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0">Dashboard <small class="text-muted fs-6">{{ today|date:"F Y" }}</small></h4>
+  <a href="{% url 'expenses:add' %}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i> Add Expense
+  </a>
+</div>
+
+<!-- Summary cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card shadow-sm">
+      <div class="card-body">
+        <p class="text-muted mb-1 small">This Month's Spend</p>
+        <h4 class="fw-bold text-danger">Rs.{{ total_month|floatformat:2 }}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card shadow-sm">
+      <div class="card-body">
+        <p class="text-muted mb-1 small">Categories</p>
+        <h4 class="fw-bold">{{ by_category|length }}</h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Spending by category -->
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-transparent fw-semibold">Spending by Category</div>
+      <div class="card-body">
+        {% if by_category %}
+          {% for item in by_category %}
+          <div class="d-flex justify-content-between mb-1 small">
+            <span>{{ item.category__name|default:"Uncategorised" }}</span>
+            <strong>Rs.{{ item.total|floatformat:2 }}</strong>
+          </div>
+          <div class="progress mb-3">
+            <div class="progress-bar" role="progressbar"
+                 style="width:{% widthratio item.total total_month 100 %}%;background:{{ item.category__color|default:'#6c757d' }}"></div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted">No expenses this month.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent expenses -->
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-transparent fw-semibold d-flex justify-content-between">
+        Recent Expenses
+        <a href="{% url 'expenses:list' %}" class="small">View all</a>
+      </div>
+      <div class="card-body p-0">
+        {% if recent %}
+        <ul class="list-group list-group-flush">
+          {% for e in recent %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-semibold">{{ e.title }}</div>
+              <small class="text-muted">{{ e.date }} {% if e.category %}· {{ e.category }}{% endif %}</small>
+            </div>
+            <span class="badge bg-danger rounded-pill">Rs.{{ e.amount|floatformat:2 }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+          <p class="text-muted p-3">No expenses yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget status -->
+  {% if budget_data %}
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-header bg-transparent fw-semibold">Budget Status – {{ today|date:"F Y" }}</div>
+      <div class="card-body">
+        <div class="row g-3">
+          {% for bd in budget_data %}
+          <div class="col-md-4">
+            <div class="d-flex justify-content-between small mb-1">
+              <span>{{ bd.budget.category }}</span>
+              <span>Rs.{{ bd.spent|floatformat:0 }} / Rs.{{ bd.budget.limit|floatformat:0 }}</span>
+            </div>
+            <div class="progress">
+              <div class="progress-bar {% if bd.pct >= 100 %}bg-danger{% elif bd.pct >= 80 %}bg-warning{% else %}bg-success{% endif %}"
+                   style="width:{{ bd.pct }}%"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+

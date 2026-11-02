@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Login | Expense Tracker{% endblock %}
+
+{% block auth_content %}
+<div class="card shadow-sm">
+  <div class="card-body p-4">
+    <h4 class="text-center mb-4"><i class="bi bi-wallet2 me-2 text-primary"></i>Expense Tracker</h4>
+    <form method="post">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <button class="btn btn-primary w-100 mt-2" type="submit">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Log In
+      </button>
+    </form>
+    <p class="text-center mt-3 mb-0 small">
+      No account? <a href="{% url 'accounts:register' %}">Register</a>
+    </p>
+  </div>
+</div>
+{% endblock auth_content %}
